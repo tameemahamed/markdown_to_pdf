@@ -2,9 +2,13 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDF Generator</title>
   <!-- Markdown parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Highlight.js for code syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <!-- Configure MathJax to recognize $ delimiters -->
   <script>
     window.MathJax = {
@@ -20,59 +24,153 @@
   <!-- MathJax for LaTeX rendering -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
+    /* Print styles for A4 paper and margins */
     @page {
       size: A4;
       margin: 0.5in;
     }
+
+    /* Base body and font styles */
     body {
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
       padding: 20px;
     }
+
+    /* Styling for the Markdown input area */
     #markdown-input {
       width: 100%;
       height: 200px;
       font-family: monospace;
+      border: 1px solid #ddd;
+      padding: 10px;
+      box-sizing: border-box;
+      border-radius: 6px;
+      resize: vertical;
     }
+
+    /* Styling for the preview area */
     #preview {
       margin-top: 20px;
-      border: 1px solid #ccc;
+      border: 1px solid #e1e4e8;
       padding: 10px;
       font-size: 16px;
       min-height: 400px;
+      border-radius: 6px;
     }
-    /* Table styling for preview */
+
+    /* Styling for non-printable elements */
+    .no-print {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .no-print h1 {
+      margin-top: 0;
+      margin-bottom: 5px;
+    }
+    
+    /* Styling for the Generate PDF button */
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      background-color: #2ea44f;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      align-self: flex-start;
+    }
+
+    button:hover {
+      background-color: #2c974b;
+    }
+    
+    /* Table styling for the preview */
     #preview table {
       width: 100%;
       border-collapse: collapse;
       margin: 10px 0;
     }
+
     #preview th, #preview td {
       border: 1px solid #bbb;
       padding: 6px;
       vertical-align: top;
       text-align: left;
     }
+
     #preview th {
       background-color: #f2f2f2;
     }
-    .no-print {
-      margin-bottom: 10px;
+
+    /* GitHub-like styling for code blocks, including line wrapping and overflow */
+    #preview pre {
+      background-color: #f6f8fa;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 16px;
+      /* Allow horizontal scrolling for very long lines that can't be wrapped */
+      overflow-x: auto;
+      /* Ensure lines wrap instead of overflowing */
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      line-height: 1.45;
+      font-size: 14px;
+      margin-bottom: 16px;
     }
+
+    /* Styling for inline code */
+    #preview code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+      font-size: 85%;
+      padding: 0.2em 0.4em;
+      margin: 0;
+      background-color: rgba(27, 31, 35, 0.05);
+      border-radius: 6px;
+    }
+
+    /* Override highlight.js styling for code inside pre blocks */
+    #preview pre code {
+      background-color: transparent;
+      padding: 0;
+      border-radius: 0;
+      /* Prevent highlighting from interfering with line wrapping */
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    /* Media query for print styles */
     @media print {
       .no-print {
         display: none;
       }
+
       body {
         margin: 0;
       }
+
       #preview {
         border: none;
         padding: 0;
         font-size: 12pt;
       }
-      #preview p, #preview table {
+
+      /* Ensure print media respects page-break-inside for key elements */
+      #preview p, #preview table, #preview pre {
         page-break-inside: avoid;
+        page-break-before: avoid;
+        page-break-after: avoid;
       }
+
+      #preview pre {
+        /* These properties help prevent orphans and widows */
+        orphans: 3;
+        widows: 3;
+      }
+
       #preview h1, #preview h2, #preview h3 {
         page-break-after: avoid;
       }
@@ -82,8 +180,53 @@
 <body>
   <div class="no-print">
     <h1>Markdown to PDF Generator</h1>
-    <textarea id="markdown-input" placeholder="Enter your Markdown here..."></textarea>
-    <button onclick="generatePDF()">Generate PDF</button>
+    <textarea id="markdown-input">
+
+# Example code snippets
+
+## 1. Python
+
+```python
+def greet(name):
+    print(f"Hello, {name}!")
+
+if __name__ == "__main__":
+    greet("World")
+````
+
+## 2. JavaScript
+
+```javascript
+function add(a, b) {
+  return a + b;
+}
+
+console.log("2 + 3 =", add(2, 3));
+```
+
+## 3. Bash
+
+```bash
+#!/usr/bin/env bash
+
+echo "Listing all files in current directory:"
+ls -lah
+```
+
+## 4. CSS
+
+```css
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+}
+
+h1 {
+  color: #333;
+}
+```
+</textarea>
+<button onclick="generatePDF()">Generate PDF</button>
   </div>
   <div id="preview"></div>
 
@@ -100,10 +243,15 @@
     const preview = document.getElementById('preview');
 
     function updatePreview() {
+      // Parse markdown to HTML
       const md = input.value;
       const html = marked.parse(md);
       preview.innerHTML = html;
-      // Typeset math in preview (including in tables)
+
+      // Highlight all code blocks after markdown is parsed
+      hljs.highlightAll();
+
+      // Typeset math in preview
       if (window.MathJax) {
         MathJax.typesetPromise([preview]).catch(err => console.error(err.message));
       }
@@ -112,6 +260,7 @@
     input.addEventListener('input', updatePreview);
 
     function generatePDF() {
+      // Trigger the browser's print dialog to save as PDF
       window.print();
     }
 
