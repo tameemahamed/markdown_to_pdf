@@ -27,7 +27,7 @@
     /* Print styles for A4 paper and margins */
     @page {
       size: A4;
-      margin: 0.5in;
+      margin: 1in 0.5in 0.5in 1in;
     }
 
     /* Base body and font styles */
@@ -142,6 +142,11 @@
       word-wrap: break-word;
     }
 
+    /* Hide Markdown-generated horizontal rules on screen */
+    #preview hr {
+      display: none;
+    }
+
     /* Media query for print styles */
     @media print {
       .no-print {
@@ -173,6 +178,11 @@
 
       #preview h1, #preview h2, #preview h3 {
         page-break-after: avoid;
+      }
+
+      /* Also hide any <hr> in print */
+      #preview hr {
+        display: none;
       }
     }
   </style>
